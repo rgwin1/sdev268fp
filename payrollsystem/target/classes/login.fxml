@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- login form layout -->
+<VBox spacing="10" alignment="CENTER" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml" fx:controller="com.mycompany.payrollsystem.controllers.LoginController">
+    
+    <!-- username input -->
+    <TextField fx:id="inputUsername" promptText="Email or Username"/>
+
+    <!-- password input -->
+    <PasswordField fx:id="inputPassword" promptText="Password or DOB"/>
+
+    <!-- user type selection -->
+    <HBox spacing="10" alignment="CENTER">
+        <RadioButton fx:id="selectEmployee" text="Employee"/>
+        <RadioButton fx:id="selectAdmin" text="Admin"/>
+    </HBox>
+
+    <!-- login button -->
+    <Button fx:id="buttonLogin" text="Login" onAction="#submitLogin"/>
+
+    <!-- error message -->
+    <Label fx:id="textError" textFill="red"/>
+    
+    <!-- exit button -->
+    <Button fx:id="exitProgram" text="Exit" onAction="#onExitClick"/>
+</VBox>

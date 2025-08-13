@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.mycompany.payrollsystem.controllers.EmployeeProfileController"
+      spacing="20" alignment="TOP_CENTER" style="-fx-padding: 30">
+
+    <Label text="Employee Profile" style="-fx-font-size: 22px; -fx-font-weight: bold"/>
+
+    <GridPane hgap="15" vgap="15">
+        <Label text="First Name:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="firstNameField" editable="false" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Last Name:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="lastNameField" editable="false" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Date of Birth:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="dobField" editable="false" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Phone Number:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <TextField fx:id="phoneField" editable="false" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Email Address:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <TextField fx:id="emailField" editable="false" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+        <Label text="Job Title:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <TextField fx:id="jobTitleField" editable="false" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+        <Label text="Hourly Wage:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+        <TextField fx:id="wageField" editable="false" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <Button fx:id="backButton" text="Back to Dashboard" onAction="#onBackClick" prefWidth="180"/>
+</VBox>

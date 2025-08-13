@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+<VBox xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.mycompany.payrollsystem.controllers.EmployeePayrollHistoryController"
+      spacing="12" alignment="CENTER" style="-fx-padding: 20">
+
+    <Label text="Your Payroll History" style="-fx-font-size: 18px; -fx-font-weight: bold"/>
+
+    <TableView fx:id="payrollTable" prefHeight="300" prefWidth="600">
+        <columns>
+            <TableColumn fx:id="colPeriod" text="Pay Period" prefWidth="150">
+                <cellValueFactory>
+                    <PropertyValueFactory property="payPeriod"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="colHours" text="Hours Worked" prefWidth="150">
+                <cellValueFactory>
+                    <PropertyValueFactory property="hoursWorked"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="colRate" text="Wage at Time" prefWidth="150">
+                <cellValueFactory>
+                    <PropertyValueFactory property="wageAtTime"/>
+                </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="colTotal" text="Gross Pay" prefWidth="150">
+                <cellValueFactory>
+                    <PropertyValueFactory property="grossPay"/>
+                </cellValueFactory>
+            </TableColumn>
+              <TableColumn fx:id="colNet" text="Net Pay" prefWidth="150">
+                <cellValueFactory>
+                    <PropertyValueFactory property="netPay"/>
+                </cellValueFactory>
+            </TableColumn>
+        </columns>
+    </TableView>
+
+    <Button fx:id="backButton" text="Back to Dashboard" onAction="#onBackClick"/>
+</VBox>

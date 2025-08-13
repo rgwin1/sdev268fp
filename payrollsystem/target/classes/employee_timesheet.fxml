@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+
+
+<BorderPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.payrollsystem.controllers.TimeEntryController">
+
+    <top>
+        <Label text="Employee Time Entry" BorderPane.alignment="CENTER"
+               style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-padding: 10"/>
+    </top>
+
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <Label text="Time Entry History" style="-fx-font-size: 16px; -fx-font-weight: bold"/>
+            <TableView fx:id="entryTable" prefHeight="300">
+                <columns>
+                    <TableColumn fx:id="colDate" text="Date">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="date"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn fx:id="colHours" text="Hours">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="hoursWorked"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn fx:id="colPTO" text="PTO">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="pto"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn fx:id="colLocked" text="Locked?">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="locked"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                </columns>
+            </TableView>
+        </VBox>
+    </center>
+
+    <right>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            
+            <Label text="New Time Entry" style="-fx-font-size: 16px; -fx-font-weight: bold"/>
+
+            <Label text="Date (YYYY-MM-DD):"/>
+            <TextField fx:id="inputDate"/>
+
+            <Label text="Hours Worked:"/>
+            <TextField fx:id="inputHours"/>
+
+            <CheckBox fx:id="checkboxPTO" text="PTO?"/>
+
+            <Button text="Submit Entry" onAction="#onSubmitTimeClick"/>
+            <Label fx:id="statusLabel" textFill="green"/>
+        </VBox>
+    </right>
+
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>            
+            <Button fx:id="backButton" text="Back to Dashboard" onAction="#onBackClick"/>
+        </HBox>
+    </bottom>
+</BorderPane>

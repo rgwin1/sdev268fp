@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- admin dashboard screen layout -->
+<VBox spacing="20" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml" fx:controller="com.mycompany.payrollsystem.controllers.AdminDashboardController">
+
+    <!-- header label -->
+    <Label text="Admin Dashboard" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+
+
+    <!-- control buttons -->
+    <HBox spacing="10" alignment="CENTER">
+        <Button fx:id="buttonManageEmployees" text="Manage Employees" onAction="#onManageEmployeesClick"/>
+        <Button fx:id="buttonPayroll" text="Payroll" onAction="#onPayrollClick"/>
+        <Button fx:id="buttonReports" text="Reports" onAction="#onReportsClick"/>
+        <Button fx:id="buttonLogout" text="Logout" onAction="#onLogoutClick"/>
+        </HBox>
+</VBox>

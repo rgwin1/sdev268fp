@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.mycompany.payrollsystem.controllers.AdminReportsController"
+      spacing="10" alignment="CENTER" style="-fx-padding: 20">
+
+    <Label text="Payroll Report" style="-fx-font-size: 18px; -fx-font-weight: bold"/>
+
+    <TableView fx:id="reportTable" prefWidth="1000">
+        <columns>
+            <TableColumn fx:id="colEmployeeId" text="Employee ID" prefWidth="100"/>
+            <TableColumn fx:id="colPayPeriod" text="Pay Period" prefWidth="150"/>
+            <TableColumn fx:id="colHoursWorked" text="Hours Worked" prefWidth="100"/>
+            <TableColumn fx:id="colWageAtTime" text="Wage at Time" prefWidth="100"/>
+            <TableColumn fx:id="colGrossPay" text="Gross Pay" prefWidth="100"/>
+            <TableColumn fx:id="colMedicalDeduction" text="Medical Deduction" prefWidth="120"/>
+            <TableColumn fx:id="colDependentStipend" text="Dependent Stipend" prefWidth="130"/>
+            <TableColumn fx:id="colStateTax" text="State Tax (3.15%)" prefWidth="110"/>
+            <TableColumn fx:id="colFederalTax" text="Federal Tax (7.65%)" prefWidth="120"/>
+            <TableColumn fx:id="colSocialSecurity" text="Social Security (6.2%)" prefWidth="140"/>
+            <TableColumn fx:id="colMedicare" text="Medicare (1.45%)" prefWidth="120"/>
+            <TableColumn fx:id="colNetPay" text="Net Pay" prefWidth="100"/>
+        </columns>
+    </TableView>
+
+    <Button fx:id="backButton" text="Back to Dashboard" onAction="#onBackClick"/>
+</VBox>

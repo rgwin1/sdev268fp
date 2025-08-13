@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.payrollsystem.controllers.EmployeeDashboardController">
+
+    <center>
+        <GridPane hgap="20" vgap="20" alignment="CENTER">
+            <Button fx:id="viewProfileButton" text="View Profile" onAction="#onViewProfileClick" GridPane.rowIndex="0" GridPane.columnIndex="0" prefWidth="160" prefHeight="80"/>
+            <Button fx:id="viewTimesheetButton" text="Timesheet" onAction="#onTimesheetClick" GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="160" prefHeight="80"/>
+            <Button fx:id="viewPayrollButton" text="Payroll History" onAction="#onPayrollClick" GridPane.rowIndex="1" GridPane.columnIndex="0" prefWidth="160" prefHeight="80"/>
+            <Button fx:id="logoutButton" text="Logout" onAction="#onLogoutClick" GridPane.rowIndex="1" GridPane.columnIndex="1" prefWidth="160" prefHeight="80"/>
+        </GridPane>
+    </center>
+
+    <top>
+        <Label text="Employee Dashboard"
+               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-padding: 20"
+               BorderPane.alignment="CENTER"/>
+    </top>
+</BorderPane>

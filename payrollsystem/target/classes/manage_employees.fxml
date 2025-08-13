@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.payrollsystem.controllers.ManageEmployeesController"
+            prefWidth="800" prefHeight="600">
+
+    <!-- Top: Search bar -->
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <children>
+                <Label text="Search EMPLID:" />
+                <TextField fx:id="searchField" promptText="Enter Employee ID..." />
+                <Button text="Search" />
+            </children>
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+        </HBox>
+    </top>
+
+    <!-- Left: Employee Table -->
+    <left>
+        <TableView fx:id="employeeTable" prefWidth="500">
+            <columns>
+                <TableColumn fx:id="colEmployeeid" text="EMPLID" prefWidth="100" />
+                <TableColumn fx:id="colLastName" text="Last Name" prefWidth="200" />
+                <TableColumn fx:id="colFirstName" text="First Name" prefWidth="200" />
+            </columns>
+        </TableView>
+    </left>
+
+    <!-- Right: Button stack -->
+    <right>
+        <VBox spacing="15" alignment="TOP_CENTER">
+            <children>
+                <Button fx:id="buttonEditEmployee" text="Edit Employee"  prefWidth="150" onAction="#onEditEmployeeClick"/>
+                <Button fx:id="buttonAddEmployee" text="Add Employee" onAction="#onAddEmployeeClick" prefWidth="150"/>
+                <Button fx:id="buttonDeleteEmployee" text="Delete Employee" prefWidth="150" onAction="#onDeleteEmployeeClick"/>
+                <Button fx:id="backButton" text="Back" prefWidth="150" onAction="#onBackClick"/>
+                <Label fx:id="statusLabel" textFill="green"/> 
+           </children>
+            <padding>
+                <Insets top="20" right="10" bottom="10" left="10"/>
+            </padding>
+        </VBox>
+    </right>
+
+</BorderPane>
