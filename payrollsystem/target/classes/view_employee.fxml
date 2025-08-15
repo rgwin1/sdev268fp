@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.payrollsystem.controllers.ViewEmployeeController"
+            prefWidth="900" prefHeight="600">
+
+    <top>
+        <HBox spacing="8">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <children>
+                <Label text="Employee ID:"/>
+                <TextField fx:id="searchField" promptText="E001"/>
+                <Button text="View Employee" onAction="#onViewEmployeeClick"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="backButton" text="Back" onAction="#onBackClick"/>
+            </children>
+        </HBox>
+    </top>
+
+    <center>
+        <TabPane>
+            <tabs>
+                <Tab text="Demographics">
+                    <content>
+                        <ScrollPane fitToWidth="true">
+                            <content>
+                                <GridPane hgap="10" vgap="8">
+                                    <padding>
+                                        <Insets top="10" right="10" bottom="10" left="10"/>
+                                    </padding>
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="25"/>
+                                        <ColumnConstraints percentWidth="75"/>
+                                    </columnConstraints>
+
+                                    <children>
+                                        <Label text="Employee ID:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                        <Label fx:id="lblEmployeeId" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                        <Label text="Name:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                        <Label fx:id="lblName" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                        <Label text="Status:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                        <Label fx:id="lblStatus" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                        <Label text="Gender:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                        <Label fx:id="lblGender" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                                        <Label text="DOB:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                        <Label fx:id="lblDob" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                                        <Label text="Phone:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                                        <Label fx:id="lblPhone" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                                        <Label text="Email:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                                        <Label fx:id="lblEmail" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+                                        <Label text="Address:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+                                        <Label fx:id="lblAddress" wrapText="true" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+                                    </children>
+                                </GridPane>
+                            </content>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+
+                <Tab text="Salary Info">
+                    <content>
+                        <GridPane hgap="10" vgap="8">
+                            <padding>
+                                <Insets top="10" right="10" bottom="10" left="10"/>
+                            </padding>
+                            <columnConstraints>
+                                <ColumnConstraints percentWidth="25"/>
+                                <ColumnConstraints percentWidth="75"/>
+                            </columnConstraints>
+
+                            <children>
+                                <Label text="Pay Type:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                                <Label fx:id="lblPayType" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                                <Label text="Wage:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                                <Label fx:id="lblWage" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                                <Label text="Department:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                                <Label fx:id="lblDepartment" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                                <Label text="Job Title:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                                <Label fx:id="lblJobTitle" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                                <Label text="Hire Date:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                                <Label fx:id="lblHireDate" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                                <Label text="Medical Coverage:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                                <Label fx:id="lblMedical" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                                <Label text="Dependents:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                                <Label fx:id="lblDependents" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+                            </children>
+                        </GridPane>
+                    </content>
+                </Tab>
+
+                <Tab text="Time Entries (Current Period)">
+                    <content>
+                        <VBox spacing="8">
+                            <padding>
+                                <Insets top="10" right="10" bottom="10" left="10"/>
+                            </padding>
+                            <children>
+                                <HBox spacing="8">
+                                    <children>
+                                        <Label text="Pay period:"/>
+                                        <Label fx:id="lblPayPeriod"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="Refresh" onAction="#onRefreshTimeEntries"/>
+                                    </children>
+                                </HBox>
+                                <TableView fx:id="timeTable" prefHeight="420">
+                                    <columns>
+                                        <TableColumn fx:id="colDate" text="Date" prefWidth="160"/>
+                                        <TableColumn fx:id="colHours" text="Hours" prefWidth="120"/>
+                                        <TableColumn fx:id="colPTO" text="PTO" prefWidth="120"/>
+                                        <TableColumn fx:id="colLocked" text="Locked" prefWidth="120"/>
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </VBox>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+</BorderPane>

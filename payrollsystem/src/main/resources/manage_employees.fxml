@@ -37,9 +37,10 @@
     <right>
         <VBox spacing="15" alignment="TOP_CENTER">
             <children>
-                <Button fx:id="buttonEditEmployee" text="Edit Employee"  prefWidth="150" onAction="#onEditEmployeeClick"/>
                 <Button fx:id="buttonAddEmployee" text="Add Employee" onAction="#onAddEmployeeClick" prefWidth="150"/>
+                <Button fx:id="buttonEditEmployee" text="Edit Employee"  prefWidth="150" onAction="#onEditEmployeeClick"/>
                 <Button fx:id="buttonDeleteEmployee" text="Delete Employee" prefWidth="150" onAction="#onDeleteEmployeeClick"/>
+                <Button fx:id="buttonViewEmployee" text="View Employee" prefWidth="150" onAction="#openViewEmployeePage"/>
                 <Button fx:id="backButton" text="Back" prefWidth="150" onAction="#onBackClick"/>
                 <Label fx:id="statusLabel" textFill="green"/> 
            </children>

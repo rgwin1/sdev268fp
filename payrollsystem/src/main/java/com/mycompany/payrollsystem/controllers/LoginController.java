@@ -72,7 +72,7 @@ public class LoginController {
             if (valid) {
                 // fetch employee info
                 EmployeeDAO empDAO = new EmployeeDAO();
-                Employee emp = empDAO.fetchEmployeeById(user);
+                Employee emp = empDAO.getEmployeeById(user);
                 Session.loggedInEmployee = emp;
 
                 FXMLLoader fx = new FXMLLoader(getClass().getResource("/employee_dashboard.fxml"));

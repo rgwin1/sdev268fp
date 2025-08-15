@@ -1,8 +1,8 @@
 package com.mycompany.payrollsystem.controllers;
 
 import com.mycompany.payrollsystem.dao.EmployeeDAO;
-import com.mycompany.payrollsystem.dao.UserDAO;
 import com.mycompany.payrollsystem.models.Employee;
+import com.mycompany.payrollsystem.controllers.ViewEmployeeController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -14,7 +14,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -28,7 +27,8 @@ public class ManageEmployeesController implements Initializable {
     @FXML private TableColumn<Employee, String> colLastName;
     @FXML private TableColumn<Employee, String> colFirstName;
     @FXML private Label statusLabel;
-    @FXML private Button backButton;
+    @FXML private Button backButton; 
+    @FXML private Button buttonViewEmployee;
 
     @FXML
     private void onAddEmployeeClick() throws IOException {
@@ -99,4 +99,26 @@ public class ManageEmployeesController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         refreshEmployeeTable();
     }
+    @FXML
+private void openViewEmployeePage() throws java.io.IOException {
+    com.mycompany.payrollsystem.models.Employee selected =
+            employeeTable.getSelectionModel().getSelectedItem();
+    if (selected == null) {
+        new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING,
+                "Select an employee first.").showAndWait();
+        return;
+    }
+
+    javafx.fxml.FXMLLoader loader =
+            new javafx.fxml.FXMLLoader(getClass().getResource("/view_employee.fxml"));
+    javafx.scene.Parent root = loader.load();
+
+    com.mycompany.payrollsystem.controllers.ViewEmployeeController controller = loader.getController();
+    controller.setSearchText(selected.getEmployeeId());
+    controller.onViewEmployeeClick();
+
+    javafx.stage.Stage stage = (javafx.stage.Stage) buttonViewEmployee.getScene().getWindow();
+    stage.setScene(new javafx.scene.Scene(root));
+}
+    
 }

@@ -1,5 +1,7 @@
 com\mycompany\payrollsystem\controllers\AdminReportsController.class
 com\mycompany\payrollsystem\controllers\PayrollPageController.class
+com\mycompany\payrollsystem\controllers\ViewEmployeeController.class
+com\mycompany\payrollsystem\controllers\PayrollPageController$1.class
 com\mycompany\payrollsystem\controllers\EmployeeDashboardController.class
 com\mycompany\payrollsystem\dao\TimeEntryDAO.class
 com\mycompany\payrollsystem\models\PayrollRow.class
@@ -20,6 +22,7 @@ com\mycompany\payrollsystem\controllers\LoginController.class
 com\mycompany\payrollsystem\PayrollSystem.class
 com\mycompany\payrollsystem\utils\Session.class
 com\mycompany\payrollsystem\utils\InputValidator.class
+com\mycompany\payrollsystem\reports\HRReportGenerator$Row.class
 com\mycompany\payrollsystem\controllers\AdminDashboardController.class
 com\mycompany\payrollsystem\dao\EmployeeDAO.class
 com\mycompany\payrollsystem\models\SalaryInfo.class

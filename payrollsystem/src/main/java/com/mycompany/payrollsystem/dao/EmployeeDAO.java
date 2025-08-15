@@ -165,7 +165,7 @@ public boolean deleteEmployeeEverywhere(String employeeId) {
         return false;
     }
 }
-public Employee fetchEmployeeById(String employeeId) {
+public Employee getEmployeeById(String employeeId) {
     String sql = "SELECT * FROM employees WHERE employeeid = ?";
 
     try (Connection conn = DatabaseManager.getConnection();
@@ -201,7 +201,38 @@ public Employee fetchEmployeeById(String employeeId) {
     return null;
 }
 
-
+public Employee getEmployeeByName(String firstName, String lastName) {
+    String sql = "SELECT * FROM employees WHERE UPPER(firstName)=UPPER(?) AND UPPER(lastName)=UPPER(?) LIMIT 1";
+    try (Connection conn = DatabaseManager.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, firstName == null ? "" : firstName.trim());
+        ps.setString(2, lastName == null ? "" : lastName.trim());
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return new Employee(
+                    rs.getString("employeeid"),
+                    rs.getString("firstName"),
+                    rs.getString("middleName"),
+                    rs.getString("lastName"),
+                    rs.getString("dob"),
+                    rs.getString("phone"),
+                    rs.getString("email"),
+                    rs.getString("status"),
+                    rs.getString("gender"),
+                    rs.getString("payType"),
+                    rs.getString("addressLine1"),
+                    rs.getString("addressLine2"),
+                    rs.getString("city"),
+                    rs.getString("state"),
+                    rs.getString("zip")
+                );
+            }
+        }
+    } catch (SQLException e) {
+        System.err.println("Error fetching employee by name: " + e.getMessage());
+    }
+    return null;
+}
 
 }
 
