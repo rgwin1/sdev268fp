@@ -1,0 +1,61 @@
+/* Global base */
+.root {
+  -fx-font-family: "Segoe UI", Roboto, Arial;
+  -fx-font-size: 13px;
+}
+
+/* Layout polish */
+.hbox, .vbox, .grid-pane, .border-pane, .tab-pane {
+  -fx-padding: 12;
+  -fx-spacing: 8;
+}
+
+/* Headings / section labels */
+.label.title {
+  -fx-font-size: 18px;
+  -fx-font-weight: bold;
+}
+
+/* Inputs */
+.text-field, .password-field, .combo-box, .date-picker {
+    -fx-pref-width: 250;
+    -fx-max-width: 300;
+  -fx-background-radius: 8;
+  -fx-padding: 8 10 8 10;
+}
+
+.text-field:focused, .password-field:focused, .combo-box:focused, .date-picker:focused {
+  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0, 0, 2);
+}
+
+/* Buttons */
+.button {
+  -fx-background-radius: 10;
+  -fx-padding: 8 14 8 14;
+}
+
+.button:hover { -fx-opacity: 0.9; }
+.button:default { -fx-background-color: -fx-accent; }
+
+/* Tables */
+.table-view {
+  -fx-background-insets: 0;
+  -fx-background-radius: 10;
+  -fx-padding: 6;
+}
+
+.table-view .column-header-background {
+  -fx-background-color: linear-gradient(to bottom, #f6f8fa, #e9edf2);
+}
+
+.table-row-cell:filled:selected {
+  -fx-background-color: -fx-accent;
+  -fx-text-fill: white;
+}
+
+/* Tabs */
+.tab-pane {
+  -fx-background-insets: 0;
+  -fx-background-radius: 10;
+}
+

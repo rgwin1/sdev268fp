@@ -3,13 +3,10 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
-<?import javafx.collections.FXCollections?>
-<?import java.lang.String?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.mycompany.payrollsystem.controllers.PayrollPageController"
-            xmlns="http://javafx.com/javafx/8">
-
+<BorderPane xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.mycompany.payrollsystem.controllers.PayrollPageController">
     <top>
         <Label text="Payroll Summary" style="-fx-font-size: 24;" BorderPane.alignment="CENTER"/>
     </top>
@@ -17,27 +14,25 @@
     <center>
         <TableView fx:id="payrollTable" prefWidth="800">
             <columns>
-                <TableColumn fx:id="colEmployeeId" text="Employee ID" />
-                <TableColumn fx:id="colName" text="Name" />
-                <TableColumn fx:id="colPayType" text="Pay Type" />
-                <TableColumn fx:id="colGross" text="Gross Pay" />
-                <TableColumn fx:id="colDeductions" text="Deductions" />
-                <TableColumn fx:id="colNet" text="Net Pay" />
+                <TableColumn fx:id="colEmployeeId" text="Employee ID"/>
+                <TableColumn fx:id="colName"       text="Name"/>
+                <TableColumn fx:id="colPayType"    text="Pay Type"/>
+                <TableColumn fx:id="colGross"      text="Gross Pay"/>
+                <TableColumn fx:id="colDeductions" text="Deductions"/>
+                <TableColumn fx:id="colNet"        text="Net Pay"/>
             </columns>
         </TableView>
     </center>
 
     <right>
         <VBox spacing="12">
-    <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
-    </padding>
-    <Button fx:id="calculatePayrollButton" text="Calculate Payroll" onAction="#onCalculatePayrollClick" prefWidth="150"/>
-    <Button fx:id="generateHRReportButton" text="Generate HR Report" onAction="#onGenerateHRReportClick"/>
-    <Button fx:id="exportReportButton" text="Export Report" onAction="#onExportReportClick" prefWidth="150"/>
-    <Button fx:id="backButton" text="Back to Dashboard" onAction="#onBackClick" prefWidth="150"/>
-</VBox>
-
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <Button fx:id="calculatePayrollButton" text="Calculate Payroll" onAction="#onCalculatePayrollClick" prefWidth="150"/>
+            <Button fx:id="generateHRReportButton" text="Generate HR Report" onAction="#onGenerateHRReportClick"/>
+            <Button fx:id="exportReportButton"     text="Export Report"     onAction="#onExportReportClick" prefWidth="150"/>
+            <Button fx:id="backButton"             text="Back to Dashboard" onAction="#onBackClick"         prefWidth="150"/>
+        </VBox>
     </right>
-
 </BorderPane>

@@ -15,13 +15,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
+/**
+ * controller for viewing employee details, salary info, and time entries
+ * allows searching by id or name and filtering entries by current pay period
+ */
 public class ViewEmployeeController {
 
     @FXML private TextField searchField;
@@ -59,12 +62,17 @@ public class ViewEmployeeController {
 
     @FXML
     public void initialize() {
+        //bind table columns to model properties
         colDate.setCellValueFactory(new PropertyValueFactory<>("date"));
         colHours.setCellValueFactory(new PropertyValueFactory<>("hoursWorked"));
         colPTO.setCellValueFactory(new PropertyValueFactory<>("pto"));
         colLocked.setCellValueFactory(new PropertyValueFactory<>("locked"));
     }
 
+    /**
+     * handles employee search and loads details into ui
+     * supports id (E001), "Last, First", or "First Last"
+     */
     @FXML
     public void onViewEmployeeClick() {
         String q = (searchField.getText() == null) ? "" : searchField.getText().trim();
@@ -75,13 +83,13 @@ public class ViewEmployeeController {
 
         Employee e = null;
 
-
+        //search by id pattern E###
         String upper = q.toUpperCase();
         if (upper.matches("^E\\d{3}$")) {
             e = employeeDAO.getEmployeeById(upper);
         }
 
-
+        //search by "Last, First"
         if (e == null && q.contains(",")) {
             String[] parts = q.split(",", 2);
             String last = parts[0].trim();
@@ -91,6 +99,7 @@ public class ViewEmployeeController {
             }
         }
 
+        //search by "First Last"
         if (e == null && q.contains(" ")) {
             String[] parts = q.trim().split("\\s+");
             if (parts.length >= 2) {
@@ -107,6 +116,7 @@ public class ViewEmployeeController {
 
         currentEmployeeId = e.getEmployeeId();
 
+        //fill general info
         lblEmployeeId.setText(e.getEmployeeId());
         String middle = e.getMiddleName() == null ? "" : (" " + e.getMiddleName());
         lblName.setText(e.getFirstName() + middle + " " + e.getLastName());
@@ -116,9 +126,11 @@ public class ViewEmployeeController {
         lblPhone.setText(e.getPhone());
         lblEmail.setText(e.getEmail());
 
+        //format address with optional line2
         String addr2 = (e.getAddressLine2() == null || e.getAddressLine2().isBlank()) ? "" : (", " + e.getAddressLine2());
         lblAddress.setText(e.getAddressLine1() + addr2 + ", " + e.getCity() + ", " + e.getState() + " " + e.getZip());
 
+        //salary info
         SalaryInfo s = salaryDAO.fetchSalaryInfoByEmployeeId(currentEmployeeId);
         if (s != null) {
             lblPayType.setText(s.getPayType());
@@ -141,7 +153,9 @@ public class ViewEmployeeController {
         loadCurrentPeriodEntries();
     }
 
-
+    /**
+     * refreshes time entries for currently loaded employee
+     */
     @FXML
     private void onRefreshTimeEntries() {
         if (currentEmployeeId == null || currentEmployeeId.isEmpty()) {
@@ -151,6 +165,7 @@ public class ViewEmployeeController {
         loadCurrentPeriodEntries();
     }
 
+    //fetches entries for current pay period and loads into table
     private void loadCurrentPeriodEntries() {
         LocalDate[] period = currentPayPeriod(LocalDate.now());
         LocalDate start = period[0];
@@ -170,24 +185,31 @@ public class ViewEmployeeController {
         timeTable.setItems(filtered);
     }
 
+    //calculates start and end dates of current pay period (mon-sun)
     private LocalDate[] currentPayPeriod(LocalDate ref) {
         LocalDate end = ref.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
         LocalDate start = end.minusDays(6);
         return new LocalDate[]{ start, end };
     }
 
+    /**
+     * navigates back to manage employees screen
+     */
     @FXML
     private void onBackClick() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/manage_employees.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) backButton.getScene().getWindow();
-            stage.setScene(new Scene(root));
+            Scene scene = new Scene(root, 800, 700);
+            scene.getStylesheets().add(getClass().getResource("/app.css").toExternalForm());
+            stage.setScene(scene);
         } catch (Exception ex) {
             showAlert(Alert.AlertType.ERROR, "Failed to go back: " + ex.getMessage());
         }
     }
 
+    //helper for showing alerts
     private void showAlert(Alert.AlertType type, String msg) {
         Alert a = new Alert(type);
         a.setTitle(type == Alert.AlertType.ERROR ? "Error" : "Info");
@@ -195,8 +217,11 @@ public class ViewEmployeeController {
         a.setContentText(msg);
         a.showAndWait();
     }
-    public void setSearchText(String text) {
-    if (searchField != null) searchField.setText(text);
-}
 
+    /**
+     * allows external controllers to preset the search field text
+     */
+    public void setSearchText(String text) {
+        if (searchField != null) searchField.setText(text);
+    }
 }

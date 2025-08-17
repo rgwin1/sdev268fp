@@ -2,17 +2,41 @@ package com.mycompany.payrollsystem.models;
 
 import javafx.beans.property.*;
 
+/**
+ * model for salary-related information tied to an employee.
+ * includes department, job, hire date, wage, and benefits.
+ */
 public class SalaryInfo {
 
+    //unique id for the employee this record belongs to
     private final StringProperty employeeId;
+    //department name (e.g., HR, IT, Sales)
     private final StringProperty department;
+    //job title (e.g., Manager, Developer)
     private final StringProperty jobTitle;
+    //hire date stored as yyyy-mm-dd
     private final StringProperty hireDate;
+    //pay type (salary or hourly)
     private final StringProperty payType;
+    //wage amount (per hour if hourly, per period if salary)
     private final DoubleProperty wage;
+    //medical coverage plan (e.g., Family, Single)
     private final StringProperty medicalCoverage;
+    //number of dependents
     private final IntegerProperty numDependents;
 
+    /**
+     * constructs a SalaryInfo object with all fields.
+     *
+     * @param employeeId employee id
+     * @param department department name
+     * @param jobTitle job title
+     * @param hireDate hire date in yyyy-mm-dd format
+     * @param payType pay type (hourly/salary)
+     * @param wage wage amount
+     * @param medicalCoverage medical coverage type
+     * @param numDependents number of dependents
+     */
     public SalaryInfo(String employeeId, String department, String jobTitle, String hireDate,
                       String payType, double wage, String medicalCoverage, int numDependents) {
         this.employeeId = new SimpleStringProperty(employeeId);
@@ -25,6 +49,7 @@ public class SalaryInfo {
         this.numDependents = new SimpleIntegerProperty(numDependents);
     }
 
+    //getters and JavaFX property accessors
     public String getEmployeeId() { return employeeId.get(); }
     public StringProperty employeeIdProperty() { return employeeId; }
 

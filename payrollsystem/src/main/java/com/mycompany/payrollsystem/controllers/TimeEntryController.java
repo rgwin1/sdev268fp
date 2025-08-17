@@ -14,10 +14,13 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.scene.control.cell.PropertyValueFactory;
-
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * controller for handling employee time entry input and display
+ * manages PTO vs hourly logic, saves entries to db, and refreshes table
+ */
 public class TimeEntryController {
 
     @FXML private TextField inputDate;
@@ -36,14 +39,17 @@ public class TimeEntryController {
     private String currentEmployeeId;
     private boolean isSalary;
 
+    /**
+     * sets employee id context and adjusts inputs based on pay type
+     */
     public void setEmployeeId(String id) {
         this.currentEmployeeId = id;
 
-        // detect pay type
+        //detect pay type
         SalaryInfoDAO sdao = new SalaryInfoDAO();
         SalaryInfo si = sdao.fetchSalaryInfoByEmployeeId(id);
 
-        // verbose, safe checks
+        //safe check with defaults
         isSalary = false;
         if (si != null) {
             String payType = si.getPayType();
@@ -52,19 +58,19 @@ public class TimeEntryController {
             }
         }
 
-        // enable inputs now that we have context
-        inputDate.setDisable(false);   // always allow date
+        //enable inputs now that we have context
+        inputDate.setDisable(false);   //always allow date
         checkboxPTO.setDisable(false);
 
         if (isSalary) {
             checkboxPTO.setSelected(true);
-            // for salaried: hours only when PTO is checked
+            //for salaried: hours only when PTO is checked
             inputHours.setDisable(!checkboxPTO.isSelected());
             if (statusLabel != null) {
                 statusLabel.setText("Salaried employee. Only PTO entries allowed.");
             }
         } else {
-            // hourly: hours always enabled
+            //hourly: hours always enabled
             inputHours.setDisable(false);
             checkboxPTO.setSelected(false);
             if (statusLabel != null) statusLabel.setText("");
@@ -75,24 +81,24 @@ public class TimeEntryController {
 
     @FXML
     public void initialize() {
-        // bind columns
+        //bind table columns to model
         colDate.setCellValueFactory(new PropertyValueFactory<>("date"));
         colHours.setCellValueFactory(new PropertyValueFactory<>("hoursWorked"));
         colPTO.setCellValueFactory(new PropertyValueFactory<>("pto"));
         colLocked.setCellValueFactory(new PropertyValueFactory<>("locked"));
 
-        // defaults
+        //defaults for new form
         inputDate.setText("");
         inputHours.setText("");
         checkboxPTO.setSelected(false);
         if (statusLabel != null) statusLabel.setText("");
 
-        // lock inputs until employee id is provided
+        //lock inputs until employee id is set
         inputDate.setDisable(true);
         inputHours.setDisable(true);
         checkboxPTO.setDisable(true);
 
-        // dynamic toggle: if salaried, hours enabled only when PTO is checked
+        //dynamic toggle: salaried employees can only log hours if PTO box checked
         checkboxPTO.selectedProperty().addListener((obs, was, isNow) -> {
             if (isSalary) {
                 inputHours.setDisable(!isNow);
@@ -100,6 +106,7 @@ public class TimeEntryController {
         });
     }
 
+    //reloads table data from dao
     private void refreshEntryTable() {
         if (currentEmployeeId == null || currentEmployeeId.isEmpty()) {
             return;
@@ -110,6 +117,10 @@ public class TimeEntryController {
         entryTable.setItems(data);
     }
 
+    /**
+     * validates input and saves time entry to db
+     * applies business rules for salary vs hourly
+     */
     @FXML
     private void onSubmitTimeClick() {
         String date = inputDate.getText().trim();
@@ -133,7 +144,7 @@ public class TimeEntryController {
             return;
         }
 
-        // salaried employees may only log PTO hours
+        //salaried employees may only log PTO
         if (isSalary && !isPto) {
             statusLabel.setText("Salaried employees can only log PTO hours.");
             return;
@@ -154,11 +165,16 @@ public class TimeEntryController {
         }
     }
 
+    /**
+     * navigates back to employee dashboard
+     */
     @FXML
     private void onBackClick() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/employee_dashboard.fxml"));
         Parent root = loader.load();
         Stage stage = (Stage) backButton.getScene().getWindow();
-        stage.setScene(new Scene(root));
+        Scene scene = new Scene(root, 800, 700);
+        scene.getStylesheets().add(getClass().getResource("/app.css").toExternalForm());
+        stage.setScene(scene);
     }
 }
