@@ -7,10 +7,10 @@
 <VBox spacing="10" alignment="CENTER" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml" fx:controller="com.mycompany.payrollsystem.controllers.LoginController">
     
     <!-- username input -->
-    <TextField fx:id="inputUsername" promptText="Email or Username"/>
+    <TextField fx:id="inputUsername" promptText="Username"/>
 
     <!-- password input -->
-    <PasswordField fx:id="inputPassword" promptText="Password or DOB"/>
+    <PasswordField fx:id="inputPassword" promptText="Password"/>
 
     <!-- user type selection -->
     <HBox spacing="10" alignment="CENTER">

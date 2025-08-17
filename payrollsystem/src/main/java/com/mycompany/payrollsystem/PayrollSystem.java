@@ -37,7 +37,7 @@ public class PayrollSystem extends Application {
         
         //set up the scene
         Scene scene = new Scene(root, 800, 700);
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
         
         //get css for consistent styling
         scene.getStylesheets().add(getClass().getResource("/app.css").toExternalForm());
