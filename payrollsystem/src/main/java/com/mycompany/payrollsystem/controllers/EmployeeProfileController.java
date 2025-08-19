@@ -22,6 +22,7 @@ public class EmployeeProfileController {
     //profile fields
     @FXML private TextField firstNameField;
     @FXML private TextField lastNameField;
+    @FXML private TextField middleNameField;
     @FXML private TextField dobField;
     @FXML private TextField phoneField;
     @FXML private TextField emailField;
@@ -43,6 +44,7 @@ public class EmployeeProfileController {
         //populate fields from employee object
         firstNameField.setText(employee.getFirstName());
         lastNameField.setText(employee.getLastName());
+        middleNameField.setText(employee.getMiddleName());
         dobField.setText(employee.getDob());
         phoneField.setText(employee.getPhone());
         emailField.setText(employee.getEmail());

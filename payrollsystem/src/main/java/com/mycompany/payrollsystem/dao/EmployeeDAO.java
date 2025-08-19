@@ -112,14 +112,14 @@ public class EmployeeDAO {
      * @return true if at least one row updated
      */
     public boolean updateEmployee(Employee emp) {
-        String sql = "UPDATE employees SET firstName = ?, middleName = ?,  lastName = ?, dob = ?, phone = ?, email = ?, status = ?, gender = ?, payType = ?, addressLine1 = ?, addressLine2 = ?, city = ?, state = ?, zip = ?" +
+        String sql = "UPDATE employees SET firstName = ?, lastName = ?,  middleName = ?, dob = ?, phone = ?, email = ?, status = ?, gender = ?, payType = ?, addressLine1 = ?, addressLine2 = ?, city = ?, state = ?, zip = ?" +
                      " WHERE employeeid = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             //bind values in the same order as the set clause
             stmt.setString(1, emp.getFirstName());
-            stmt.setString(2, emp.getMiddleName());
-            stmt.setString(3, emp.getLastName());
+            stmt.setString(2, emp.getLastName());
+            stmt.setString(3, emp.getMiddleName());
             stmt.setString(4, emp.getDob());
             stmt.setString(5, emp.getPhone());
             stmt.setString(6, emp.getEmail());
@@ -238,8 +238,8 @@ public class EmployeeDAO {
                 return new Employee(
                         rs.getString("employeeid"),
                         rs.getString("firstName"),
-                        rs.getString("middleName"),
                         rs.getString("lastName"),
+                        rs.getString("middleName"),
                         rs.getString("dob"),
                         rs.getString("phone"),
                         rs.getString("email"),
@@ -281,8 +281,8 @@ public class EmployeeDAO {
                     return new Employee(
                             rs.getString("employeeid"),
                             rs.getString("firstName"),
-                            rs.getString("middleName"),
                             rs.getString("lastName"),
+                            rs.getString("middleName"),
                             rs.getString("dob"),
                             rs.getString("phone"),
                             rs.getString("email"),

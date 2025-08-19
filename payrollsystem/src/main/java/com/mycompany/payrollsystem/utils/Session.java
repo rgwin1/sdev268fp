@@ -1,6 +1,8 @@
 package com.mycompany.payrollsystem.utils;
 
 import com.mycompany.payrollsystem.models.Employee;
+import java.time.LocalDate;
+
 
 /**
  * session utility for tracking the currently logged-in employee.
@@ -14,4 +16,6 @@ public class Session {
 
     //static reference to the employee that is currently logged in
     public static Employee loggedInEmployee;
+    public static LocalDate lastPeriodStart;
+    public static LocalDate lastPeriodEnd;
 }

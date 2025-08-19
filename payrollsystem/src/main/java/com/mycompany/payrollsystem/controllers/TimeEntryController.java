@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.cell.PropertyValueFactory;
 import java.io.IOException;
 import java.util.List;
+import java.sql.SQLException;
 
 /**
  * controller for handling employee time entry input and display
@@ -27,13 +28,11 @@ public class TimeEntryController {
     @FXML private TextField inputHours;
     @FXML private CheckBox checkboxPTO;
     @FXML private Label statusLabel;
-
     @FXML private TableView<TimeEntry> entryTable;
     @FXML private TableColumn<TimeEntry, String> colDate;
     @FXML private TableColumn<TimeEntry, Double> colHours;
     @FXML private TableColumn<TimeEntry, Boolean> colPTO;
     @FXML private TableColumn<TimeEntry, Boolean> colLocked;
-
     @FXML private Button backButton;
 
     private String currentEmployeeId;
@@ -42,12 +41,12 @@ public class TimeEntryController {
     /**
      * sets employee id context and adjusts inputs based on pay type
      */
-    public void setEmployeeId(String id) {
-        this.currentEmployeeId = id;
+    public void setEmployeeId(String employeeid) {
+        this.currentEmployeeId = employeeid;
 
         //detect pay type
         SalaryInfoDAO sdao = new SalaryInfoDAO();
-        SalaryInfo si = sdao.fetchSalaryInfoByEmployeeId(id);
+        SalaryInfo si = sdao.fetchSalaryInfoByEmployeeId(employeeid);
 
         //safe check with defaults
         isSalary = false;
@@ -78,7 +77,7 @@ public class TimeEntryController {
 
         refreshEntryTable();
     }
-
+    
     @FXML
     public void initialize() {
         //bind table columns to model
@@ -104,6 +103,31 @@ public class TimeEntryController {
                 inputHours.setDisable(!isNow);
             }
         });
+        entryTable.getSelectionModel().selectedItemProperty().addListener((obs, old, sel) -> {
+    if (sel == null) {
+        inputDate.clear();
+        inputHours.clear();
+        checkboxPTO.setSelected(false);
+        statusLabel.setText("");
+        return;
+    }
+    // mirror selected row into fields for edit/delete
+    inputDate.setText(sel.getDate());
+    inputHours.setText(Double.toString(sel.getHoursWorked()));
+    checkboxPTO.setSelected(sel.isPto());
+
+    // for salaried employees, keep PTO only
+    if (isSalary) {
+        checkboxPTO.setDisable(false);
+        inputHours.setDisable(!checkboxPTO.isSelected());
+        statusLabel.setText("Salaried employee. Only PTO entries allowed.");
+    } else {
+        inputHours.setDisable(false);
+        checkboxPTO.setDisable(false);
+        statusLabel.setText("");
+    }
+});
+
     }
 
     //reloads table data from dao
@@ -164,6 +188,114 @@ public class TimeEntryController {
             }
         }
     }
+    
+    @FXML
+public void onEditEntryClick() throws SQLException {
+    TimeEntry selected = entryTable.getSelectionModel().getSelectedItem();
+    if (selected == null) {
+        statusLabel.setText("Select a row to edit.");
+        return;
+    }
+    //prevent editing locked rows
+    if (selected.isLocked()) {
+        statusLabel.setText("Locked entries cannot be edited.");
+        return;
+    }
+
+    String originalDate = selected.getDate();   
+    String newDate = inputDate.getText().trim();   
+    String hourText = inputHours.getText().trim();
+    boolean newIsPto = checkboxPTO.isSelected();
+
+    //validate inputs
+    if (!InputValidator.isValidDate(newDate)) {
+        statusLabel.setText("Invalid date format (expected yyyy-MM-dd).");
+        return;
+    }
+    double hours;
+    try {
+        hours = Double.parseDouble(hourText);
+        if (!InputValidator.isValidHoursWorked(hours)) {
+            statusLabel.setText("Hours must be between 0 and 24.");
+            return;
+        }
+    } catch (NumberFormatException e) {
+        statusLabel.setText("Invalid number format for hours.");
+        return;
+    }
+    if (isSalary && !newIsPto) {
+        statusLabel.setText("Salaried employees can only log PTO hours.");
+        return;
+    }
+
+    TimeEntryDAO dao = new TimeEntryDAO();
+    if (dao.isEntryLocked(currentEmployeeId, originalDate)) {
+        statusLabel.setText("Cannot edit. This payroll period is locked.");
+        return;
+    }
+    
+    TimeEntry editedEntry = new TimeEntry(currentEmployeeId, newDate, hours, newIsPto, false);
+
+    boolean entryEdit = dao.updateTimeEntry(editedEntry, originalDate);
+    if (entryEdit) {
+        statusLabel.setText("Entry updated.");
+        refreshEntryTable();
+        // keep selection in sync if date changed
+        entryTable.getItems().stream()
+                .filter(entry -> entry.getDate().equals(newDate))
+                .findFirst()
+                .ifPresent(entry -> entryTable.getSelectionModel().select(entry));
+    } else {
+        statusLabel.setText("Update failed (row may be locked or not found).");
+    }
+}
+/**
+ * allows employee to delete a time entry
+ * @throws SQLException 
+ */
+@FXML
+private void onDeleteEntryClick() throws SQLException {
+    TimeEntry selected = entryTable.getSelectionModel().getSelectedItem();
+    if (selected == null) {
+        statusLabel.setText("Select a row to delete.");
+        return;
+    }
+    if (selected.isLocked()) {
+        statusLabel.setText("Locked entries cannot be deleted.");
+        return;
+    }
+
+    // confirm with the user
+    Alert confirm = new Alert(
+            Alert.AlertType.CONFIRMATION,
+            "Delete entry on " + selected.getDate() + "?",
+            ButtonType.YES, ButtonType.NO
+    );
+    confirm.setHeaderText("Confirm Deletion");
+    var result = confirm.showAndWait();
+    if (result.isEmpty() || result.get() != ButtonType.YES) return;
+
+    TimeEntryDAO dao = new TimeEntryDAO();
+
+    // optional extra guard: check if that date/period got locked meanwhile
+    if (dao.isEntryLocked(currentEmployeeId, selected.getDate())) {
+        statusLabel.setText("Cannot delete. This payroll period is locked.");
+        return;
+    }
+
+    boolean deleted = dao.deleteTimeEntry(currentEmployeeId, selected.getDate());
+    if (deleted) {
+        statusLabel.setText("Entry deleted.");
+        refreshEntryTable();
+        // clear input fields
+        inputDate.clear();
+        inputHours.clear();
+        checkboxPTO.setSelected(false);
+    } else {
+        statusLabel.setText("Delete failed (row may be locked or not found).");
+    }
+}
+
 
     /**
      * navigates back to employee dashboard

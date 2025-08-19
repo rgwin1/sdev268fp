@@ -265,7 +265,7 @@ private void onUpdateEmployeeClick() {
  */
     @FXML
     private void onBackClick() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/admin_dashboard.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/manage_employees.fxml"));
         Parent root = loader.load();
         Stage stage = (Stage) backButton.getScene().getWindow();
         Scene scene = new Scene(root, 800, 700);

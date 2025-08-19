@@ -64,6 +64,8 @@
             <CheckBox fx:id="checkboxPTO" text="PTO?"/>
 
             <Button text="Submit Entry" onAction="#onSubmitTimeClick"/>
+            <Button text="Edit Entry" onAction="#onEditEntryClick"/>
+            <Button text="Delete Entry" onAction="#onDeleteEntryClick"/>
             <Label fx:id="statusLabel" textFill="green"/>
         </VBox>
     </right>

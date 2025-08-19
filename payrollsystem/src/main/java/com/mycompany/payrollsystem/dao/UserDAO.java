@@ -84,26 +84,50 @@ public class UserDAO {
      * @param role expected role for the login
      * @return true if credentials are valid
      */
-    public boolean validateUser(String employeeid, String inputPassword, String role) {
-        String sql = "SELECT password FROM users WHERE employeeid = ? AND role = ?";
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            //bind filters
-            stmt.setString(1, employeeid);
-            stmt.setString(2, role.toLowerCase()); //normalize role
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                String storedHash = rs.getString("password");
-                //verify hash matches the provided password
-                return HashUtil.verifyPassword(inputPassword, storedHash);
+    public boolean validateUser(String userId, String inputPassword, String role) {
+    // Admin path: users table only
+    if ("ADMIN".equalsIgnoreCase(role)) {
+        final String adminSql =
+            "SELECT password FROM users " +
+            "WHERE TRIM(employeeid)=TRIM(?) AND UPPER(role)='ADMIN' " +
+            "LIMIT 1";
+        try (PreparedStatement ps = conn.prepareStatement(adminSql)) {
+            ps.setString(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return false;
+                String storedHash = rs.getString(1);
+                return storedHash != null && HashUtil.verifyPassword(inputPassword, storedHash);
             }
         } catch (SQLException e) {
-            System.err.println("error validating user: " + e.getMessage());
+            System.err.println("[auth-admin] " + e.getMessage());
+            return false;
         }
+    }
 
+    // Employee path: must be Active in employees
+    final String empSql =
+        "SELECT u.password " +
+        "FROM users u " +
+        "JOIN employees e ON e.employeeid = u.employeeid " +
+        "WHERE TRIM(u.employeeid)=TRIM(?) " +
+        "  AND UPPER(u.role)=UPPER(?) " +
+        "  AND UPPER(TRIM(e.status))='ACTIVE' " +
+        "LIMIT 1";
+    try (PreparedStatement ps = conn.prepareStatement(empSql)) {
+        ps.setString(1, userId);
+        ps.setString(2, role);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (!rs.next()) return false;
+            String storedHash = rs.getString(1);
+            return storedHash != null && HashUtil.verifyPassword(inputPassword, storedHash);
+        }
+    } catch (SQLException e) {
+        System.err.println("[auth-emp] " + e.getMessage());
         return false;
     }
+}
+
+
 
     /**
      * gets the role for a given employee id

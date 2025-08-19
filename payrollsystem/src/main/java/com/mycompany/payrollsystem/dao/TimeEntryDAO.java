@@ -27,36 +27,6 @@ public class TimeEntryDAO {
     }
 
     /**
-     * creates the time_entries table if missing
-     * columns:
-     * - employeeid text
-     * - date text (yyyy-mm-dd recommended)
-     * - hoursWorked real
-     * - isPTO integer 0 or 1
-     * - isLocked integer 0 or 1
-     * primary key on (employeeid, date)
-     */
-    public void createTimeEntriesTable() {
-        String sql = """
-            CREATE TABLE IF NOT EXISTS time_entries (
-                employeeid TEXT NOT NULL,
-                date TEXT NOT NULL,
-                hoursWorked REAL NOT NULL,
-                isPTO INTEGER NOT NULL,
-                isLocked INTEGER NOT NULL DEFAULT 0,
-                PRIMARY KEY (employeeid, date)
-            );
-        """;
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.execute();
-            System.out.println("time_entries table ready.");
-        } catch (SQLException e) {
-            System.err.println("error creating time_entries table: " + e.getMessage());
-        }
-    }
-
-    /**
      * inserts a new time entry for an employee on a date
      *
      * @param employeeid employee id
@@ -165,4 +135,82 @@ public class TimeEntryDAO {
         }
         return false;
     }
+    /**
+     * updates employee's timesheet after editing
+     * @param timeEntry
+     * @return true if not locked
+     * @throws SQLException 
+     */
+    
+    public boolean updateTimeEntry(TimeEntry timeEntry, String originalDate) throws SQLException {
+        String sql = "UPDATE time_entries " +
+                "SET date = ?, hoursWorked = ?, isPTO = ? " +
+                "WHERE employeeid = ? AND date = ? AND isLocked = 0";
+        
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, timeEntry.getDate());
+            ps.setDouble(2, timeEntry.getHoursWorked());
+            ps.setBoolean(3, timeEntry.isPto());
+            ps.setString(4, timeEntry.getEmployeeId());
+            ps.setString(5, originalDate);
+            return ps.executeUpdate() == 1;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+           }
+                
+     }
+    /**
+     * allow employee to delete time entry if payroll not locked
+     * @param employeeid
+     * @return true if not locked
+     * @throws SQLException 
+     */
+   public boolean deleteTimeEntry(String employeeid, String date) throws SQLException {
+    String sql = "DELETE FROM time_entries WHERE employeeid = ? AND date = ? AND isLocked = 0";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, employeeid);
+        ps.setString(2, date);
+        int affected = ps.executeUpdate();
+        return affected > 0; // allow 1 or more rows (in case of dupes)
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        return false;
+    }
+}
+    /**
+     * 
+     * @param employeeid
+     * @param startDate
+     * @param endDate
+     * @return list
+     * @throws SQLException 
+     */
+    public List<TimeEntry> findByEmployeeAndPeriod(String employeeid, String startDate, String endDate) throws SQLException {
+        String sql = "SELECT employeeid, date, hoursWorked, isPTO, isLocked " + 
+                "FROM time_entries " + 
+                "WHERE employeeid = ? AND date>= ? AND date <= ? " + 
+                "ORDER BY date";
+        List<TimeEntry> list = new ArrayList<>();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, employeeid);
+            ps.setString(2, startDate);
+            ps.setString(3, endDate);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    TimeEntry timeEntry = new TimeEntry();
+                    timeEntry.setEmployeeId(rs.getString("employeeid"));
+                    timeEntry.setDate(rs.getString("date"));
+                    timeEntry.setHoursWorked(rs.getDouble("hoursWorked"));
+                    timeEntry.setPto(rs.getBoolean("isPTO"));
+                    timeEntry.setLocked(rs.getBoolean("isLocked"));
+                    list.add(timeEntry);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return list;
+    }
+    
 }

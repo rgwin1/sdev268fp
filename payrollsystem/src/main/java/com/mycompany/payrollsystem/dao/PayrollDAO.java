@@ -232,4 +232,47 @@ public class PayrollDAO {
             e.printStackTrace();
         }
     }
+    // Fetch rows for a specific period (used by loadFromDb)
+public List<PayrollRecord> fetchPayrollByPeriod(String start, String end) {
+    List<PayrollRecord> list = new ArrayList<>();
+    String sql = "SELECT * FROM payroll WHERE payPeriodStart=? AND payPeriodEnd=? ORDER BY employeeid";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, start);
+        ps.setString(2, end);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(new PayrollRecord(
+                    rs.getString("employeeid"),
+                    rs.getString("payPeriodStart"),
+                    rs.getString("payPeriodEnd"),
+                    rs.getString("payDate"),
+                    rs.getDouble("hoursWorked"),
+                    rs.getDouble("overtimeHours"),
+                    rs.getDouble("wageAtTime"),
+                    rs.getDouble("grossPay"),
+                    rs.getDouble("taxWithheld"),
+                    rs.getDouble("netPay"),
+                    rs.getInt("isSignedOff") == 1
+                ));
+            }
+        }
+    } catch (SQLException e) {
+        System.err.println("fetchPayrollByPeriod: " + e.getMessage());
+    }
+    return list;
+}
+
+// Prevent duplicates when recalculating the same period
+public void deletePayrollForPeriod(String empId, String start, String end) {
+    String sql = "DELETE FROM payroll WHERE employeeid=? AND payPeriodStart=? AND payPeriodEnd=?";
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, empId);
+        ps.setString(2, start);
+        ps.setString(3, end);
+        ps.executeUpdate();
+    } catch (SQLException e) {
+        System.err.println("deletePayrollForPeriod: " + e.getMessage());
+    }
+}
+
 }

@@ -66,6 +66,8 @@ public class PayrollRecord {
     public String getPayPeriodStart() { return payPeriodStart; }
 
     public String getPayPeriodEnd() { return payPeriodEnd; }
+     
+    public String getPayPeriod() { return payPeriodStart + " to " + payPeriodEnd;}
 
     public String getPayDate() { return payDate; }
 
@@ -80,6 +82,8 @@ public class PayrollRecord {
     public double getTaxWithheld() { return taxWithheld; }
 
     public double getNetPay() { return netPay; }
+    
+    public double getDeductions() { return grossPay - netPay;}
 
     public boolean isSignedOff() { return isSignedOff; }
 }

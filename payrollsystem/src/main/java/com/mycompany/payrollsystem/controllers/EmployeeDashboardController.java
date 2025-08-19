@@ -36,7 +36,9 @@ private void onViewProfileClick() throws IOException {
     
     //switch scene to profile screen
     Stage stage = (Stage) viewProfileButton.getScene().getWindow();
-    stage.setScene(new Scene(root));
+    Scene scene = new Scene(root, 400, 700);
+    scene.getStylesheets().add(getClass().getResource("/app.css").toExternalForm());
+    stage.setScene(scene);
 }
 
 /**
@@ -55,7 +57,9 @@ private void onTimesheetClick() throws IOException {
    
     //switch scene to timesheen screen
     Stage stage = (Stage) viewTimesheetButton.getScene().getWindow();
-    stage.setScene(new Scene(root));
+    Scene scene = new Scene(root, 800, 700);
+    scene.getStylesheets().add(getClass().getResource("/app.css").toExternalForm());
+    stage.setScene(scene);
 }
 
     /**

@@ -32,6 +32,11 @@
                     <PropertyValueFactory property="grossPay"/>
                 </cellValueFactory>
             </TableColumn>
+            <TableColumn fx:id="colDeductions" text="Deductions" prefWidth="150">
+                <cellValueFactory>
+                    <PropertyValueFactory property="Deductions"/>
+                </cellValueFactory>
+            </TableColumn>
               <TableColumn fx:id="colNet" text="Net Pay" prefWidth="150">
                 <cellValueFactory>
                     <PropertyValueFactory property="netPay"/>

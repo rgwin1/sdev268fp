@@ -161,7 +161,7 @@ public class AddEmployeeController {
             EmployeeDAO employeeDAO = new EmployeeDAO();
             String employeeId = employeeDAO.getNextEmployeeId();
 
-            Employee emp = new Employee(employeeId, firstName, middleName, lastName, dob, phone, email,
+            Employee emp = new Employee(employeeId, firstName, lastName, middleName, dob, phone, email,
                     status, gender, payType, addressLine1, addressLine2, city, state, zip);
 
             boolean added = employeeDAO.addEmployee(emp);

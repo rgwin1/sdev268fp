@@ -101,9 +101,11 @@ public class LoginController {
 
                 //load employee dashboard
                 FXMLLoader fx = new FXMLLoader(getClass().getResource("/employee_dashboard.fxml"));
-                Parent page = fx.load();
+                Parent root = fx.load();
                 Stage stage = (Stage) inputUsername.getScene().getWindow();
-                stage.setScene(new Scene(page));
+                Scene scene = new Scene(root, 800, 700);
+                scene.getStylesheets().add(getClass().getResource("/app.css").toExternalForm());
+                stage.setScene(scene);
             } else {
                 textError.setText("Invalid credentials.");
             }

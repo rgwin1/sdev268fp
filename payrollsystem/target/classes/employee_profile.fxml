@@ -15,21 +15,24 @@
 
         <Label text="Last Name:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
         <TextField fx:id="lastNameField" editable="false" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        
+        <Label text="Middle Name:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="middleNameField" editable="false" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                
+        <Label text="Date of Birth:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <TextField fx:id="dobField" editable="false" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-        <Label text="Date of Birth:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <TextField fx:id="dobField" editable="false" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        <Label text="Phone Number:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <TextField fx:id="phoneField" editable="false" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-        <Label text="Phone Number:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-        <TextField fx:id="phoneField" editable="false" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <Label text="Email Address:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+        <TextField fx:id="emailField" editable="false" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-        <Label text="Email Address:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-        <TextField fx:id="emailField" editable="false" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+        <Label text="Job Title:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+        <TextField fx:id="jobTitleField" editable="false" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
-        <Label text="Job Title:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-        <TextField fx:id="jobTitleField" editable="false" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
-
-        <Label text="Hourly Wage:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-        <TextField fx:id="wageField" editable="false" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+        <Label text="Hourly Wage:" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+        <TextField fx:id="wageField" editable="false" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
     </GridPane>
 
     <Button fx:id="backButton" text="Back to Dashboard" onAction="#onBackClick" prefWidth="180"/>

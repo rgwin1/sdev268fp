@@ -7,9 +7,7 @@
 
     <!-- header label -->
     <Label text="Admin Dashboard" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
-
-
-
+    
     <!-- control buttons -->
     <HBox spacing="10" alignment="CENTER">
         <Button fx:id="buttonManageEmployees" text="Manage Employees" onAction="#onManageEmployeesClick"/>
@@ -17,4 +15,11 @@
         <Button fx:id="buttonReports" text="Reports" onAction="#onReportsClick"/>
         <Button fx:id="buttonLogout" text="Logout" onAction="#onLogoutClick"/>
         </HBox>
+        <!-- spacer pushes the next node to the bottom -->
+    <Region VBox.vgrow="ALWAYS"/>
+    
+    
+                <Label fx:id="labelStatusVersion" style="-fx-font-size: 20; -fx-text-fill: gray; -fx-font-weight: bold;" text="" maxWidth="Infinity" alignment="CENTER"/>
+            
+
 </VBox>
