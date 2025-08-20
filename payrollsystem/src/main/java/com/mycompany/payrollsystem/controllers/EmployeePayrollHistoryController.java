@@ -3,6 +3,7 @@ package com.mycompany.payrollsystem.controllers;
 import com.mycompany.payrollsystem.dao.PayrollDAO;
 import com.mycompany.payrollsystem.models.PayrollRecord;
 import com.mycompany.payrollsystem.utils.Session;
+import com.mycompany.payrollsystem.utils.RecursiveUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -31,6 +32,14 @@ public class EmployeePayrollHistoryController {
         PayrollDAO dao = new PayrollDAO();
         List<PayrollRecord> records = dao.fetchPayrollByEmployeeId(Session.loggedInEmployee.getEmployeeId());
         payrollTable.getItems().setAll(records);
+        
+            // --- recursive overtime calculation across all payroll records ---
+    List<Double> dailyHours = records.stream()
+            .map(PayrollRecord::getHoursWorked)
+            .toList();
+
+    double totalOvertime = RecursiveUtils.calculateOvertime(dailyHours, 0);
+        
     }
     /**
      * handles the back button, navigates to the employee dashboard

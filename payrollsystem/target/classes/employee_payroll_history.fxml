@@ -22,6 +22,11 @@
                     <PropertyValueFactory property="hoursWorked"/>
                 </cellValueFactory>
             </TableColumn>
+              <TableColumn fx:id="colOvertime" text="Overtime Hours" prefWidth="150">
+                <cellValueFactory>
+                    <PropertyValueFactory property="overtimeHours"/>
+                </cellValueFactory>
+            </TableColumn>
             <TableColumn fx:id="colRate" text="Wage at Time" prefWidth="150">
                 <cellValueFactory>
                     <PropertyValueFactory property="wageAtTime"/>

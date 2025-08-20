@@ -18,9 +18,9 @@ import com.mycompany.payrollsystem.dao.TimeEntryDAO;
 import com.mycompany.payrollsystem.dao.SalaryInfoDAO;
 import com.mycompany.payrollsystem.dao.PayrollDAO;
 import com.mycompany.payrollsystem.reports.HRReportGenerator;
+import com.mycompany.payrollsystem.utils.Session;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.application.Platform;
-
 import java.util.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -32,18 +32,30 @@ import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.time.temporal.TemporalAdjusters;
 
+/**
+ * Controller for the Admin Payroll page.
+ * Responsibilities:
+ *  - Calculate payroll for the current pay period and persist results
+ *  - Lock time entries for the period after calculation
+ *  - Display previously calculated payroll rows
+ *  - Export CSV and generate the HR sign-off report
+ *
+ * Notes on business rules used here:
+ *  - Pay period is Monday through Sunday (7 days ending on the most recent Sunday)
+ *  - Salaried employees are paid 8 hours per weekday
+ *  - Hourly overtime: time-and-a-half for hours above 40 in the week and for Saturday work
+ *  - Deductions are pretax: medical and dependent stipend reduce taxable income
+ *  - Taxes: state 3.15%, federal 7.65%, Social Security 6.2%, Medicare 1.45%
+ */
 public class PayrollPageController {
 
     @FXML private TableView<PayrollRow> payrollTable;
-
     @FXML private TableColumn<PayrollRow, String> colEmployeeId;
     @FXML private TableColumn<PayrollRow, String> colName;
     @FXML private TableColumn<PayrollRow, String> colPayType;
-
     @FXML private TableColumn<PayrollRow, Number> colGross;
     @FXML private TableColumn<PayrollRow, Number> colDeductions;
     @FXML private TableColumn<PayrollRow, Number> colNet;
-
     @FXML private Button calculatePayrollButton;
     @FXML private Button generateHRReportButton;
     @FXML private Button exportReportButton;
@@ -56,18 +68,23 @@ public class PayrollPageController {
     private final SalaryInfoDAO salaryDAO = new SalaryInfoDAO();
     private final PayrollDAO payrollDAO = new PayrollDAO();
 
-    // simple per-load caches to avoid DB calls on every cell repaint
+    //simple per-load caches to avoid DB calls on every cell repaint
     private final Map<String, String> nameCache   = new HashMap<>();
     private final Map<String, String> payTypeCache = new HashMap<>();
-
+    
+        /**
+     * Wire up table columns, attach caches, and perform an initial load
+     * after the scene is ready. listens for window focus to refresh
+     * from the database when returning to this screen.
+     */
     @FXML
     public void initialize() {
-        // direct fields from model
+        //direct fields from model
         colEmployeeId.setCellValueFactory(cd -> new ReadOnlyStringWrapper(cd.getValue().getEmployeeId()));
         colGross.setCellValueFactory(cd -> cd.getValue().grossPayProperty());
         colNet.setCellValueFactory(cd -> cd.getValue().netPayProperty());
 
-        // name/pay type via small caches
+        //name/pay type via small caches
         colName.setCellValueFactory(cd -> new ReadOnlyStringWrapper(
                 nameCache.computeIfAbsent(cd.getValue().getEmployeeId(), this::lookupName)
         ));
@@ -75,7 +92,7 @@ public class PayrollPageController {
                 payTypeCache.computeIfAbsent(cd.getValue().getEmployeeId(), this::lookupPayType)
         ));
 
-        // deductions = medical + state + federal + ss + medicare - dependent stipend
+        //deductions = medical + state + federal + ss + medicare - dependent stipend
         colDeductions.setCellValueFactory(cd ->
             cd.getValue().medicalDeductionProperty()
               .add(cd.getValue().stateTaxProperty())
@@ -87,10 +104,10 @@ public class PayrollPageController {
 
         payrollTable.setItems(payrollData);
 
-        // initial load after scene is ready (pull from persisted payroll for last period)
+        //initial load after scene is ready (pull from persisted payroll for last period)
         Platform.runLater(this::refreshFromSession);
 
-        // when returning focus to this window, RELOAD from DB (not just refresh UI)
+        //when returning focus to this window, reload from database (not just refresh UI)
         payrollTable.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 newScene.windowProperty().addListener((o, oldWin, newWin) -> {
@@ -103,17 +120,28 @@ public class PayrollPageController {
             }
         });
     }
-
+  /**
+     * Resolve employee full name for table display.
+     * @param empId employee id
+     * @return "First Last" or empty string if not found
+     */
     private String lookupName(String empId) {
-        var e = employeeDAO.getEmployeeById(empId);
-        return (e == null) ? "" : (e.getFirstName() + " " + e.getLastName());
+        Employee employee = employeeDAO.getEmployeeById(empId);
+        return (employee == null) ? "" : (employee.getFirstName() + " " + employee.getLastName());
     }
-
+        /**
+     * Resolve pay type for table display.
+     * @param empId employee id
+     * @return pay type string or empty string if not found
+     */
     private String lookupPayType(String empId) {
-        var s = salaryDAO.fetchSalaryInfoByEmployeeId(empId);
-        return (s == null) ? "" : s.getPayType();
+        SalaryInfo salaryInfo = salaryDAO.fetchSalaryInfoByEmployeeId(empId);
+        return (salaryInfo == null) ? "" : salaryInfo.getPayType();
     }
-
+     /**
+     * Count weekdays between two dates inclusive.
+     * Used to compute salaried hours in the period.
+     */
     private int countWeekdays(LocalDate start, LocalDate end) {
         int days = 0;
         for (LocalDate d = start; !d.isAfter(end); d = d.plusDays(1)) {
@@ -124,13 +152,27 @@ public class PayrollPageController {
         }
         return days;
     }
-
+ /**
+     * Compute the current pay period for a reference date.
+     * The period is Monday through Sunday, ending on the most recent Sunday.
+     * @param ref reference date
+     * @return array with [start, end] dates
+     */
     private LocalDate[] currentPayPeriod(LocalDate ref) {
         LocalDate end = ref.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
         LocalDate start = end.minusDays(6);
         return new LocalDate[] { start, end };
     }
-
+    /**
+     * Calculate payroll for the current pay period and persist results.
+     * Business rules:
+     *  - Skip terminated employees
+     *  - Lock all time entries for the period after insert
+     *  - Salaried: 8 hours per weekday at wage
+     *  - Hourly: overtime includes Saturday hours and hours above 40 at 1.5x
+     *
+     * @throws SQLException if DAO operations fail
+     */
     @FXML
     private void onCalculatePayrollClick() throws SQLException {
         payrollData.clear();
@@ -141,18 +183,18 @@ public class PayrollPageController {
         String payDate = endDate.plusDays(7).toString();
         String payPeriod = startDate + " to " + endDate;
 
-        // remember this period so we can auto-reload on return
-        com.mycompany.payrollsystem.utils.Session.lastPeriodStart = startDate;
-        com.mycompany.payrollsystem.utils.Session.lastPeriodEnd   = endDate;
+        //remember this period so we can auto-reload on return
+        Session.lastPeriodStart = startDate;
+        Session.lastPeriodEnd   = endDate;
 
         List<Employee> allEmployees = employeeDAO.getAllEmployees();
-        for (Employee emp : allEmployees) {
-            if (emp.getStatus() != null && emp.getStatus().equalsIgnoreCase("Terminated")) continue;
+        for (Employee employee : allEmployees) {
+            if (employee.getStatus() != null && employee.getStatus().equalsIgnoreCase("Terminated")) continue;
 
-            String id = emp.getEmployeeId();
-            String payType = emp.getPayType();
+            String id = employee.getEmployeeId();
+            String payType = employee.getPayType();
 
-            // gather entries in period (skip locked)
+            //get entries in period (skip locked)
             List<TimeEntry> entries = timeEntryDAO.fetchTimeEntriesByEmployeeId(id);
 
             double totalHours = 0, ptoHours = 0, saturdayHours = 0;
@@ -201,7 +243,7 @@ public class PayrollPageController {
                         stateTax, federalTax, socialSecurity, medicare, netPay
                 ));
 
-                // prevent duplicates if re-running same period
+                //prevent duplicates if rerunning same period
                 payrollDAO.deletePayrollForPeriod(id, startDate.toString(), endDate.toString());
 
                 payrollDAO.insertPayrollRecord(new PayrollRecord(
@@ -238,7 +280,7 @@ public class PayrollPageController {
                         stateTax, federalTax, socialSecurity, medicare, netPay
                 ));
 
-                // prevent duplicates if re-running same period
+                //prevent duplicates if rerunning same period
                 payrollDAO.deletePayrollForPeriod(id, startDate.toString(), endDate.toString());
 
                 payrollDAO.insertPayrollRecord(new PayrollRecord(
@@ -249,7 +291,7 @@ public class PayrollPageController {
             }
         }
 
-        // lock entries for the period
+        //lock entries for the period
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String start = startDate.format(formatter);
         String end   = endDate.format(formatter);
@@ -266,61 +308,71 @@ public class PayrollPageController {
         payrollTable.refresh();
     }
 
-    // -------- Helpers to reload from persisted payroll table --------
 
+  /**
+     * Load the previously used period if available, otherwise
+     * compute the current period, then load rows from the DB.
+     */
     private void refreshFromSession() {
         LocalDate start, end;
-        if (com.mycompany.payrollsystem.utils.Session.lastPeriodStart != null &&
-            com.mycompany.payrollsystem.utils.Session.lastPeriodEnd   != null) {
-            start = com.mycompany.payrollsystem.utils.Session.lastPeriodStart;
-            end   = com.mycompany.payrollsystem.utils.Session.lastPeriodEnd;
+        if (Session.lastPeriodStart != null &&
+            Session.lastPeriodEnd   != null) {
+            start = Session.lastPeriodStart;
+            end   = Session.lastPeriodEnd;
         } else {
             var p = currentPayPeriod(LocalDate.now());
             start = p[0]; end = p[1];
         }
         loadFromDb(start, end);
     }
-
+    /**
+     * Load persisted payroll rows for a given period, recompute display-only
+     * deduction columns from current salary info, and refresh the table.
+     * @param start period start date
+     * @param end period end date
+     */
     private void loadFromDb(LocalDate start, LocalDate end) {
-        // clear caches for a clean rebuild
+        //clear caches for a clean rebuild
         nameCache.clear();
         payTypeCache.clear();
 
-        List<PayrollRecord> recs = payrollDAO.fetchPayrollByPeriod(start.toString(), end.toString());
+        List<PayrollRecord> records = payrollDAO.fetchPayrollByPeriod(start.toString(), end.toString());
 
         payrollData.clear();
-        for (var r : recs) {
-            // recompute medical/dependents/taxes from salary_info for display (matches your table columns)
-            var si = salaryDAO.fetchSalaryInfoByEmployeeId(r.getEmployeeId());
-            double medical = (si != null && "Family".equalsIgnoreCase(si.getMedicalCoverage())) ? 100 : 50;
-            double depend  = (si != null ? 45 * si.getNumDependents() : 0);
+        for (PayrollRecord record : records) {
+            //recompute medical/dependents/taxes from salary_info for display (matches your table columns)
+            SalaryInfo salaryInfo = salaryDAO.fetchSalaryInfoByEmployeeId(record.getEmployeeId());
+            double medical = (salaryInfo != null && "Family".equalsIgnoreCase(salaryInfo.getMedicalCoverage())) ? 100 : 50;
+            double depend  = (salaryInfo != null ? 45 * salaryInfo.getNumDependents() : 0);
 
-            double taxable = r.getGrossPay() - medical - depend;
+            double taxable = record.getGrossPay() - medical - depend;
             double state   = taxable * 0.0315;
-            double ss      = taxable * 0.062;
+            double socialsecurity      = taxable * 0.062;
             double med     = taxable * 0.0145;
             double federal = taxable * 0.0765;
 
             payrollData.add(new PayrollRow(
-                r.getEmployeeId(),
-                r.getPayPeriodStart() + " to " + r.getPayPeriodEnd(),
-                r.getHoursWorked(),
-                r.getWageAtTime(),
-                r.getGrossPay(),
+                record.getEmployeeId(),
+                record.getPayPeriodStart() + " to " + record.getPayPeriodEnd(),
+                record.getHoursWorked(),
+                record.getWageAtTime(),
+                record.getGrossPay(),
                 medical,
                 depend,
                 state,
                 federal,
-                ss,
+                socialsecurity,
                 med,
-                r.getNetPay()
+                record.getNetPay()
             ));
         }
         payrollTable.refresh();
     }
 
-    // ------- export / back / HR report unchanged below -------
-
+        /**
+     * Export the visible payroll table to CSV.
+     * File name includes the pay period when available.
+     */
     @FXML
     private void onExportReportClick() {
         FileChooser fileChooser = new FileChooser();
@@ -376,7 +428,9 @@ public class PayrollPageController {
             }
         }
     }
-
+    /**
+     * takes user back to admin_dashboard.fxml
+     */
     @FXML
     private void onBackClick() {
         try {
@@ -390,7 +444,11 @@ public class PayrollPageController {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Generate the HR sign-off report for the current pay period.
+     * Requires that payroll rows are present for the period.
+     * Shows a save dialog and writes a plain text report.
+     */
     @FXML
     private void onGenerateHRReportClick() {
         if (payrollData.isEmpty()) {
@@ -416,7 +474,7 @@ public class PayrollPageController {
                 String payPeriod = startDate + " to " + endDate;
 
                 HRReportGenerator generator = new HRReportGenerator();
-                var data = generator.getPayrollData(startDate, endDate);
+                List<HRReportGenerator.Row> data = generator.getPayrollData(startDate, endDate);
                 generator.generateReport(data, file.getAbsolutePath(), payPeriod);
 
                 new Alert(Alert.AlertType.INFORMATION) {{

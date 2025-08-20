@@ -5,6 +5,7 @@ import com.mycompany.payrollsystem.dao.SalaryInfoDAO;
 import com.mycompany.payrollsystem.models.TimeEntry;
 import com.mycompany.payrollsystem.models.SalaryInfo;
 import com.mycompany.payrollsystem.utils.InputValidator;
+import com.mycompany.payrollsystem.utils.RecursiveUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -139,6 +140,8 @@ public class TimeEntryController {
         List<TimeEntry> entries = dao.fetchTimeEntriesByEmployeeId(currentEmployeeId);
         ObservableList<TimeEntry> data = FXCollections.observableArrayList(entries);
         entryTable.setItems(data);
+        
+
     }
 
     /**

@@ -7,6 +7,7 @@ com\mycompany\payrollsystem\controllers\AddEmployeeController.class
 com\mycompany\payrollsystem\controllers\EditEmployeeController.class
 com\mycompany\payrollsystem\reports\HRReportGenerator.class
 com\mycompany\payrollsystem\dao\PayrollDAO.class
+com\mycompany\payrollsystem\utils\RecursiveUtils.class
 com\mycompany\payrollsystem\dao\UserDAO.class
 com\mycompany\payrollsystem\models\TimeEntry.class
 com\mycompany\payrollsystem\utils\HashUtil.class
